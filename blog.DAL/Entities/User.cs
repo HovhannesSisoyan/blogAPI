@@ -16,6 +16,6 @@ namespace blog.DAL
         public string LastName { get; set; }
         public DateTime BirthDate { get; set; }
         public bool Gender { get; set; }
-        public List<Post> Posts { get; } = new List<Post>();
+        public List<Post> Posts { get; set;} = new List<Post>();
     }
 }

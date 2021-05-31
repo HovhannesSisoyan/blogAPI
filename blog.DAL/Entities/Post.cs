@@ -16,7 +16,6 @@ using System.ComponentModel.DataAnnotations.Schema;
             [ForeignKey(nameof(UserId))]
             public int UserId { get; set; }
             public User User { get; set; }
-            [ForeignKey(nameof(UserId))]
             public List<Image> Image { get; set; }
         }
  }

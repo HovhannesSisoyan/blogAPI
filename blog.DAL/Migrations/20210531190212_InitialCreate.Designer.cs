@@ -10,7 +10,7 @@ using blog.DAL;
 namespace blog.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210529064443_InitialCreate")]
+    [Migration("20210531190212_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,7 +38,7 @@ namespace blog.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Image");
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("blog.DAL.Post", b =>
@@ -64,7 +64,7 @@ namespace blog.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Post");
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("blog.DAL.User", b =>
@@ -97,7 +97,7 @@ namespace blog.DAL.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("User");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("blog.DAL.Image", b =>
