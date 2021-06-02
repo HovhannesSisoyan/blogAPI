@@ -16,6 +16,7 @@ namespace blog.DAL
         public User Create(User entity)
         {
             _context.Users.Add(entity);
+            _context.SaveChanges();
             return entity;
         }
         public IList<User> ReadAll()
@@ -48,6 +49,7 @@ namespace blog.DAL
                 trackedEntity.Gender = entity.Gender;
                 trackedEntity.Posts = entity.Posts;
             }
+            _context.SaveChanges();
             return trackedEntity;
         }
         public void Delete(User entity)
@@ -58,6 +60,7 @@ namespace blog.DAL
             {
                 _context.Users.Remove(trackedEntity);
             }
+            _context.SaveChanges();
         }
         public void Dispose()
         {

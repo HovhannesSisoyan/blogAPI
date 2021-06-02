@@ -16,6 +16,7 @@ namespace blog.DAL
         public Image Create(Image entity)
         {
             _context.Images.Add(entity);
+            _context.SaveChanges();
             return entity;
         }
         public IList<Image> ReadAll()
@@ -41,6 +42,7 @@ namespace blog.DAL
             {
                 trackedEntity.PostId = entity.PostId;
             }
+            _context.SaveChanges();
             return trackedEntity;
         }
         public void Delete(Image entity)
@@ -51,6 +53,7 @@ namespace blog.DAL
             {
                 _context.Images.Remove(trackedEntity);
             }
+            _context.SaveChanges();
         }
         public void Dispose()
         {
