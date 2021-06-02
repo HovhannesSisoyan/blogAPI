@@ -8,6 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
         {
             [Key]
             public int ImageId { get; set; }
+            public string Url { get; set; }
 
             [ForeignKey(nameof(PostId))]
             public int PostId { get; set; }
