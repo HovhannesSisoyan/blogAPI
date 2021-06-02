@@ -1,6 +1,6 @@
-﻿using System;
+﻿using blog.DAL;
 using Microsoft.AspNetCore.Mvc;
-using  Microsoft.AspNetCore.Cors ;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.Extensions.Logging;
 
 namespace blog.Controllers
@@ -20,10 +20,11 @@ namespace blog.Controllers
         [HttpGet("/")]
 
         [HttpGet]
-        public string Get()
+        public IActionResult Get()
         {
-            var rng = new Random();
-            return "Home page data";
+            PostRepository postRepository = new PostRepository();
+            var response = postRepository.ReadAll();
+            return Ok(response);
         }
     }
 }
