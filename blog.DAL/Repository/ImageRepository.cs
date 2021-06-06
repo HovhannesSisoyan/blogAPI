@@ -15,7 +15,15 @@ namespace blog.DAL
         }
         public Image Create(Image entity)
         {
-            _context.Images.Add(entity);
+            var image = _context.Images.Find(entity);
+            if (image != null)
+            {
+                return image;
+            }
+            else
+            {
+                _context.Images.Add(entity);
+            }
             _context.SaveChanges();
             return entity;
         }
