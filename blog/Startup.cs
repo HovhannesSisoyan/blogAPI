@@ -3,8 +3,8 @@ using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
@@ -22,7 +22,8 @@ namespace blog
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);;
             services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
             {
                 builder.SetIsOriginAllowed(origin => true) 
@@ -40,9 +41,9 @@ namespace blog
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = "hovhannes",
+                        ValidIssuer = Configuration["Jwt:Key"],
                         ValidAudience = "hovhannes",
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("myKeymyKeymyKeymyKeymyKeymyKeymyKeymyKeymyKeymyKeymyKey"))
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
 
                     };
                 });

@@ -1,15 +1,16 @@
-using blog.DAL;
 using System;
+using blog.DAL;
 using System.Linq;
 using System.Text;
 using System.Security.Claims;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Authorization;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 
 namespace blog.Controllers
 {
@@ -19,18 +20,20 @@ namespace blog.Controllers
     {
 
         private readonly ILogger<HomeController> _logger;
+        private readonly IConfiguration _configuration;
 
-        public LoginController(ILogger<HomeController> logger)
+        public LoginController(ILogger<HomeController> logger, IConfiguration configuration)
         {
+            _configuration = configuration;
             _logger = logger;
         }
         [EnableCors("CorsPolicy")]
-        [HttpGet("/login")]
-        public IActionResult Login(string username, string pass)
+        [HttpPost("/login")]
+        public IActionResult Login(User userr)
         {
             User login = new User();
-            login.Username = username;
-            login.Password = pass;
+            login.Username = userr.Username;
+            login.Password = userr.Password;
             IActionResult response = Unauthorized();
 
             var user = AuthenticateUser(login);
@@ -39,7 +42,7 @@ namespace blog.Controllers
                 var tokenStr = GenerateJSONWebToken(user);
                 response = Ok(new { token = tokenStr });
             }
-            return response;
+            return CreatedAtAction(nameof(Login), response);
         }
 
         private User AuthenticateUser(User login)
@@ -53,7 +56,7 @@ namespace blog.Controllers
         }
         private string GenerateJSONWebToken(User userInfo)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("myKeymyKeymyKeymyKeymyKeymyKeymyKeymyKeymyKeymyKeymyKey"));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
@@ -63,8 +66,8 @@ namespace blog.Controllers
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
             var token = new JwtSecurityToken(
-                issuer: "hovhannes",
-                audience: "hovhannes",
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Issuer"],
                 claims,
                 expires: DateTime.Now.AddMinutes(120),
                 signingCredentials: credentials
