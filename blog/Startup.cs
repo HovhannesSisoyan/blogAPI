@@ -1,9 +1,12 @@
+using System.Text;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace blog
 {
@@ -19,13 +22,32 @@ namespace blog
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);;
             services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
             {
-                builder.AllowAnyOrigin()
+                builder.SetIsOriginAllowed(origin => true) 
                        .AllowAnyMethod()
-                       .AllowAnyHeader();
+                       .AllowAnyHeader()
+                       .AllowCredentials()
+                       .Build();
             }));
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = Configuration["Jwt:Issuer"],
+                        ValidAudience = Configuration["Jwt:Issuer"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+
+                    };
+                });
+            services.AddMvc();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "blog", Version = "v1" });
@@ -44,6 +66,7 @@ namespace blog
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseAuthentication();
 
             app.UseAuthorization();
             app.UseCors("CorsPolicy");
