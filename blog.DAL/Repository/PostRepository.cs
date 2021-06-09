@@ -28,12 +28,22 @@ namespace blog.DAL
 
         public Post ReadById(int id)
         {
-            var response = _context.Posts
-                               .Where(post => post.PostId == id)
-                               .SingleOrDefault();
-            response.User = userRepository.ReadById(response.UserId);
+            var response = _context.Posts.Include(post => post.User)
+                .Where(post => post.PostId == id)
+                .Include(post => post.User.Posts)
+                .SingleOrDefault();
             return response;
         }
+
+        public IList<Post> ReadByTitle(string title)
+        {
+            var response = _context.Posts.Include(post => post.User)
+                .Where(post => post.Title == title)
+                .Include(post => post.User.Posts)
+                .ToList();
+            return response;
+        }
+
         public Post Update(Post entity)
         {
             Post trackedEntity = _context.Posts.Find(entity.PostId);

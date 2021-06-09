@@ -32,6 +32,20 @@ namespace blog.Controllers
                 return Ok(response);
         }
 
+        [HttpGet("title")]
+        public IActionResult GetByTitle(string title)
+        {
+            var response = action.ReadByTitle(title);
+            if (response.Count != 0)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
         [HttpPost("create")]
         public IActionResult Create(Post post)
         {
