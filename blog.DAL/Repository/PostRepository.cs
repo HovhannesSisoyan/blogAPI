@@ -22,11 +22,7 @@ namespace blog.DAL
         }
         public IList<Post> ReadAll()
         {
-            var response = _context.Posts.ToList();
-            for (int i = 0; i < response.Count; i++)
-            {
-                response[i].User = userRepository.ReadById(response[i].UserId);
-            }
+            var response = _context.Posts.Include(post => post.User).ToList(); 
             return response;
         }
 

@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations.Schema;
         {
             [Key]
             public int ImageId { get; set; }
-            [Required, JsonProperty("Url:")]
+            [Required]
             public string Url { get; set; }
 
             [ForeignKey(nameof(PostId))]

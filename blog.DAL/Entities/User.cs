@@ -10,19 +10,19 @@ namespace blog.DAL
     {
         [Key]
         public int UserId { get; set; }
-        [Required,EmailAddress, JsonProperty("Email:")]
+        [Required,EmailAddress]
         public string Email { get; set; }
-        [Required, JsonProperty("Username:")]
+        [Required]
         public string Username { get; set; }
-        [Required, JsonProperty("Password:")]
+        [Required]
         public string Password { get; set; }
-        [Required, JsonProperty("FirstName:")]
+        [Required]
         public string FirstName { get; set; }
-        [Required, JsonProperty("LastName:")]
+        [Required]
         public string LastName { get; set; }
-        [Required, JsonProperty("BirthDate:")]
+        [Required]
         public DateTime BirthDate { get; set; }
-        [Required, JsonProperty("Gender:")]
+        [Required]
         public bool Gender { get; set; }
         public List<Post> Posts { get; set;} = new List<Post>();
     }
