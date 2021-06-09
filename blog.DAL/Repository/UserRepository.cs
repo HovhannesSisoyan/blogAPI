@@ -15,7 +15,15 @@ namespace blog.DAL
         }
         public User Create(User entity)
         {
-            _context.Users.Add(entity);
+            var response = _context.Users.Find(entity);
+            if (response == null)
+            {
+                _context.Users.Add(entity);
+            }
+            else
+            {
+                return null;
+            }
             _context.SaveChanges();
             return entity;
         }
@@ -26,9 +34,16 @@ namespace blog.DAL
 
         public User ReadById(int id)
         {
-            return _context.Users
+            PostRepository a = new PostRepository();
+            var user = _context.Users
                                .Where(user => user.UserId == id)
                                .SingleOrDefault();
+            for (int i = 0; i < user.Posts.Count; i++)
+            {
+                Post post = a.ReadById(user.Posts[i].PostId);
+                user.Posts.Add(post);
+            }
+            return user;
         }
         public User Update(User entity)
         {

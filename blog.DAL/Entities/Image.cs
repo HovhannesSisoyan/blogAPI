@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,6 +9,7 @@ using System.ComponentModel.DataAnnotations.Schema;
         {
             [Key]
             public int ImageId { get; set; }
+            [Required]
             public string Url { get; set; }
 
             [ForeignKey(nameof(PostId))]
