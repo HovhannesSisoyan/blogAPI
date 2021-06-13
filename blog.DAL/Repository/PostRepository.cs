@@ -8,7 +8,6 @@ namespace blog.DAL
     public class PostRepository : IRepository<Post, int>, IDisposable
     {
         private ApplicationDbContext _context;
-        public UserRepository userRepository = new UserRepository();
         public PostRepository()
         {
             ApplicationDbContextFactory applicationDbContextFactory = new ApplicationDbContextFactory();
@@ -38,9 +37,10 @@ namespace blog.DAL
         public IList<Post> ReadByTitle(string title)
         {
             var response = _context.Posts.Include(post => post.User)
-                .Where(post => post.Title == title)
+                .Where(post => post.Title.Contains(title))
                 .Include(post => post.User.Posts)
                 .ToList();
+
             return response;
         }
 
