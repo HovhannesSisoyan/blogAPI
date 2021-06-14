@@ -29,7 +29,6 @@ namespace blog.DAL
         {
             var response = _context.Posts.Include(post => post.User)
                 .Where(post => post.PostId == id)
-                .Include(post => post.User.Posts)
                 .SingleOrDefault();
             return response;
         }
@@ -38,7 +37,6 @@ namespace blog.DAL
         {
             var response = _context.Posts.Include(post => post.User)
                 .Where(post => post.Title.Contains(title))
-                .Include(post => post.User.Posts)
                 .ToList();
 
             return response;
