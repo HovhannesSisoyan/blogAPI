@@ -1,8 +1,7 @@
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace blog.DAL
 {
@@ -14,7 +13,7 @@ namespace blog.DAL
         public string Email { get; set; }
         [Required]
         public string Username { get; set; }
-        [Required]
+        [Required, JsonIgnore]
         public string Password { get; set; }
         [Required]
         public string FirstName { get; set; }
