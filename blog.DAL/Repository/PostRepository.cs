@@ -21,7 +21,7 @@ namespace blog.DAL
         }
         public IList<Post> ReadAll()
         {
-            var response = _context.Posts.Include(post => post.User).ToList(); 
+            var response = _context.Posts.Include(post => post.User).ToList();
             return response;
         }
 

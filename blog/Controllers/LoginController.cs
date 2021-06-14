@@ -14,6 +14,13 @@ using Microsoft.Extensions.Configuration;
 
 namespace blog.Controllers
 {
+    public class Login
+    {
+        public int UserId { get; set; }
+        public string EmailOrUsername { get; set; }
+        public string Password { get; set; }
+        public string Token { get; set; }
+    } 
     [ApiController]
     [Route("[controller]")]
     public class LoginController : ControllerBase
@@ -28,31 +35,46 @@ namespace blog.Controllers
             _logger = logger;
         }
         [EnableCors("CorsPolicy")]
-        [HttpPost("/login")]
-        public IActionResult Login(User userr)
+        [HttpPost("/register")]
+        public IActionResult Register(User user)
         {
-            User login = new User();
-            login.Username = userr.Username;
-            login.Password = userr.Password;
+            UserRepository action = new UserRepository();
+            var resposne = action.Create(user);
+            return Ok(resposne);
+        }
+        [EnableCors("CorsPolicy")]
+        [HttpPost("/login")]
+        public IActionResult Login(Login credentials)
+        {
+            Login login = new Login();
+            login.EmailOrUsername = credentials.EmailOrUsername;
+            login.Password = credentials.Password;
             IActionResult response = Unauthorized();
 
             var user = AuthenticateUser(login);
             if(user != null)
             {
                 var tokenStr = GenerateJSONWebToken(user);
-                response = Ok(new { token = tokenStr });
+                response = Ok(new { token = tokenStr, user });
             }
             return CreatedAtAction(nameof(Login), response);
         }
 
-        private User AuthenticateUser(User login)
+        private User AuthenticateUser(Login login)
         {
             User user = null;
-            if (true)
+            UserRepository userRepository = new UserRepository();
+            user = userRepository.getUserByEmail(login.EmailOrUsername);
+            if (user == null)
             {
-                user = new User { Username = "Sisoyan", Email = "Sisoyan@gmail.com" };
+                user = userRepository.getUserByUsername(login.EmailOrUsername);
             }
-            return user;
+            if (user != null && user.Password == login.Password)
+            {
+                return user;
+            } else {
+                return null;
+            }
         }
         private string GenerateJSONWebToken(User userInfo)
         {
@@ -74,6 +96,40 @@ namespace blog.Controllers
             );
             var encodedToken = new JwtSecurityTokenHandler().WriteToken(token);
             return encodedToken;
+        }
+        [EnableCors("CorsPolicy")]
+        [HttpPost("/restore-login")]
+        public IActionResult RestoreLogin(Login login)
+        {
+            UserRepository userRepository = new UserRepository();
+            IActionResult response = Unauthorized();
+            bool isTokenValid = ValidateCurrentToken(login.Token);
+            User user = userRepository.getUserById(login.UserId);
+            if (isTokenValid) {
+                response = Ok(new { token = login.Token, user});
+            }
+            return response;
+        }
+        private bool ValidateCurrentToken(string token)
+        {
+        	var tokenHandler = new JwtSecurityTokenHandler();
+        	try
+        	{
+        		tokenHandler.ValidateToken(token, new TokenValidationParameters
+        		{
+        			ValidateIssuerSigningKey = true,
+        			ValidateIssuer = true,
+        			ValidateAudience = true,
+        			ValidIssuer = _configuration["Jwt:Issuer"],
+        			ValidAudience = _configuration["Jwt:Issuer"],
+        			IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]))
+        		}, out SecurityToken validatedToken);
+        	}
+        	catch
+        	{
+        		return false;
+        	}
+        	return true;
         }
         [Authorize]
         [HttpPost("Post")]

@@ -15,7 +15,7 @@ namespace blog.DAL
         }
         public User Create(User entity)
         {
-            var response = _context.Users.Find(entity);
+            var response = _context.Users.Find(entity.UserId);
             if (response == null)
             {
                 _context.Users.Add(entity);
@@ -76,6 +76,15 @@ namespace blog.DAL
                 _context.Users.Remove(trackedEntity);
             }
             _context.SaveChanges();
+        }
+        public User getUserByUsername(string username) {
+            return _context.Users.Where(user => user.Username == username).FirstOrDefault();
+        }
+        public User getUserByEmail(string email) {
+            return _context.Users.Where(user => user.Email == email).FirstOrDefault();
+        }
+        public User getUserById(int id) {
+            return _context.Users.Where(user => user.UserId == id).FirstOrDefault();
         }
         public void Dispose()
         {
