@@ -18,5 +18,6 @@ namespace blog.DAL
             public int UserId { get; set; }
             public User User { get; set; }
             public List<Image> Image { get; set; }
+            public List<Comment> Comments { get; set; }
       }
 }

@@ -10,15 +10,21 @@ namespace blog.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
-        private UserRepository action = new UserRepository();
-        [HttpPost("create")]
+        private UserRepository repository;
+
+        public UsersController(UserRepository repository)
+        {
+            this.repository = repository;
+        }
+
+        [HttpPost]
         public IActionResult Create(User user)
         {
             if (user.Password != user.FirstName || user.Password != user.FirstName)
             {
-                var resposne = action.Create(user);
+                var resposne = repository.Create(user);
                 if (resposne != null)
                 {
                     return Ok(resposne);
@@ -37,14 +43,14 @@ namespace blog.Controllers
         [HttpGet]
         public IActionResult ReadAll()
         {
-            var response = action.ReadAll();
+            var response = repository.ReadAll();
             return Ok(response);
         }
 
         [HttpGet("{id}")]
         public IActionResult ReadById(int id)
         {
-            var response = action.ReadById(id);
+            var response = repository.ReadById(id);
             if (response != null)
             {
                 return Ok(response);
@@ -55,12 +61,12 @@ namespace blog.Controllers
             }
         }
 
-        [HttpPut("update")]
+        [HttpPut]
         public IActionResult Update(User user)
         {
             if (user.Password != user.FirstName || user.Password != user.FirstName)
             {
-                var response = action.Update(user);
+                var response = repository.Update(user);
                 return Ok(response);
             }
             else
@@ -69,16 +75,10 @@ namespace blog.Controllers
             }
         }
 
-        [HttpGet("dispose")]
-        public void Dispose()
-        {
-            action.Dispose();
-        }
-
-        [HttpDelete("delete")]
+        [HttpDelete]
         public IActionResult Delete(User user)
         {
-            action.Delete(user);
+            repository.Delete(user);
             return Ok("The user has been deleted successfully");
         }
     }

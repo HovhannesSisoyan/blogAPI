@@ -7,6 +7,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using blog.Controllers;
+using blog.DAL;
+using blog.DAL.Repository;
 
 namespace blog
 {
@@ -52,6 +55,21 @@ namespace blog
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "blog", Version = "v1" });
             });
+
+
+
+            services.AddTransient<PostRepository, PostRepository>();
+            services.AddTransient<PostsController>();
+
+            services.AddTransient<UserRepository, UserRepository>();
+            services.AddTransient<UsersController>();
+
+            services.AddTransient<ImageRepository, ImageRepository>();
+            services.AddTransient<ImagesController>();
+
+            services.AddTransient<CommentRepository, CommentRepository>();
+            services.AddTransient<CommentsController>();
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

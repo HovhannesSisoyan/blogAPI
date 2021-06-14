@@ -8,7 +8,6 @@ namespace blog.DAL
     public class PostRepository : IRepository<Post, int>, IDisposable
     {
         private ApplicationDbContext _context;
-        public UserRepository userRepository = new UserRepository();
         public PostRepository()
         {
             ApplicationDbContextFactory applicationDbContextFactory = new ApplicationDbContextFactory();
@@ -28,12 +27,21 @@ namespace blog.DAL
 
         public Post ReadById(int id)
         {
-            var response = _context.Posts
-                               .Where(post => post.PostId == id)
-                               .SingleOrDefault();
-            response.User = userRepository.ReadById(response.UserId);
+            var response = _context.Posts.Include(post => post.User)
+                .Where(post => post.PostId == id)
+                .SingleOrDefault();
             return response;
         }
+
+        public IList<Post> ReadByTitle(string title)
+        {
+            var response = _context.Posts.Include(post => post.User)
+                .Where(post => post.Title.Contains(title))
+                .ToList();
+
+            return response;
+        }
+
         public Post Update(Post entity)
         {
             Post trackedEntity = _context.Posts.Find(entity.PostId);

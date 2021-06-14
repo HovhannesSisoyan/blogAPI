@@ -10,27 +10,32 @@ namespace blog.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class ImageController : ControllerBase
+    public class ImagesController : ControllerBase
     {
-        ImageRepository action = new ImageRepository();
-        [HttpPost("create")]
+        private ImageRepository repository;
+
+        public ImagesController(ImageRepository repository)
+        {
+            this.repository = repository;
+        }
+        [HttpPost]
         public IActionResult Create(Image image)
         {
-            var response = action.Create(image);
+            var response = repository.Create(image);
             return Ok(response);
         }
 
         [HttpGet]
         public IActionResult ReadAll()
         {
-            var response = action.ReadAll();
+            var response = repository.ReadAll();
             return Ok(response);
         }
 
         [HttpGet("{id}")]
         public IActionResult ReadById(int id)
         {
-            var response = action.ReadById(id);
+            var response = repository.ReadById(id);
             if (response != null)
             {
                 return Ok(response);
@@ -41,23 +46,17 @@ namespace blog.Controllers
             }
         }
 
-        [HttpPut("update")]
+        [HttpPut]
         public IActionResult Update(Image image)
         {
-            var response = action.Update(image);
+            var response = repository.Update(image);
             return Ok(response);
         }
 
-        [HttpGet("dispose")]
-        public void Dispose()
-        {
-            action.Dispose();
-        }
-
-        [HttpDelete("delete")]
+        [HttpDelete]
         public IActionResult Delete(Image image)
         {
-            action.Delete(image);
+            repository.Delete(image);
             return Ok("The user has been deleted successfully");
         }
     }
