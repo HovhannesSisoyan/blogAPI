@@ -1,25 +1,34 @@
 using System;
 using blog.DAL;
-using System.Linq;
 using System.Text;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Cors;
-using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace blog.Controllers
 {
-    public class Login
+    public class LoginCredential
     {
         public int UserId { get; set; }
         public string EmailOrUsername { get; set; }
         public string Password { get; set; }
         public string Token { get; set; }
+        public static string GetHashedPassword(string password, byte[] salt)
+        {
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: password,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA1,
+                iterationCount: 10000,
+                numBytesRequested: 256 / 8));
+            return hashed;
+            }
     } 
     [ApiController]
     [Route("[controller]")]
@@ -28,6 +37,7 @@ namespace blog.Controllers
 
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
+        private readonly UserRepository _userRepository = new UserRepository();
 
         public LoginController(ILogger<HomeController> logger, IConfiguration configuration)
         {
@@ -38,15 +48,22 @@ namespace blog.Controllers
         [HttpPost("/register")]
         public IActionResult Register(User user)
         {
-            UserRepository action = new UserRepository();
-            var resposne = action.Create(user);
+            byte[] salt = new byte[128 / 8];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(salt);
+            }
+            user.Salt = salt;
+            user.Password = LoginCredential.GetHashedPassword(user.Password, salt);
+
+            var resposne = _userRepository.Create(user);
             return Ok(resposne);
         }
         [EnableCors("CorsPolicy")]
         [HttpPost("/login")]
-        public IActionResult Login(Login credentials)
+        public IActionResult Login(LoginCredential credentials)
         {
-            Login login = new Login();
+            LoginCredential login = new LoginCredential();
             login.EmailOrUsername = credentials.EmailOrUsername;
             login.Password = credentials.Password;
             IActionResult response = Unauthorized();
@@ -60,16 +77,15 @@ namespace blog.Controllers
             return CreatedAtAction(nameof(Login), response);
         }
 
-        private User AuthenticateUser(Login login)
+        private User AuthenticateUser(LoginCredential login)
         {
             User user = null;
-            UserRepository userRepository = new UserRepository();
-            user = userRepository.getUserByEmail(login.EmailOrUsername);
+            user = _userRepository.getUserByEmail(login.EmailOrUsername);
             if (user == null)
             {
-                user = userRepository.getUserByUsername(login.EmailOrUsername);
+                user = _userRepository.getUserByUsername(login.EmailOrUsername);
             }
-            if (user != null && user.Password == login.Password)
+            if (user != null && user.Password == LoginCredential.GetHashedPassword(login.Password, user.Salt))
             {
                 return user;
             } else {
@@ -99,12 +115,11 @@ namespace blog.Controllers
         }
         [EnableCors("CorsPolicy")]
         [HttpPost("/restore-login")]
-        public IActionResult RestoreLogin(Login login)
+        public IActionResult RestoreLogin(LoginCredential login)
         {
-            UserRepository userRepository = new UserRepository();
             IActionResult response = Unauthorized();
             bool isTokenValid = ValidateCurrentToken(login.Token);
-            User user = userRepository.getUserById(login.UserId);
+            User user = _userRepository.getUserById(login.UserId);
             if (isTokenValid) {
                 response = Ok(new { token = login.Token, user});
             }
@@ -130,20 +145,6 @@ namespace blog.Controllers
         		return false;
         	}
         	return true;
-        }
-        [Authorize]
-        [HttpPost("Post")]
-        public string Post()
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            IList<Claim> claim = identity.Claims.ToList();
-            var userName = claim[0].Value;
-            return "Welcome to: " + userName;
-        }
-        [Authorize]
-        public ActionResult<IEnumerable<string>> Get()
-        {
-            return new string[] { "Value1", "Value2", "Value3" };
         }
     }
 }

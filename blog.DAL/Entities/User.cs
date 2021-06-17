@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace blog.DAL
 {
+    [Serializable]
     public class User
     {
         [Key]
@@ -13,7 +14,7 @@ namespace blog.DAL
         public string Email { get; set; }
         [Required]
         public string Username { get; set; }
-        [Required, JsonIgnore]
+        [Required,JsonIgnore]
         public string Password { get; set; }
         [Required]
         public string FirstName { get; set; }
@@ -24,5 +25,6 @@ namespace blog.DAL
         [Required]
         public bool Gender { get; set; }
         public List<Post> Posts { get; set;} = new List<Post>();
+        public byte[] Salt { get; set; }
     }
 }

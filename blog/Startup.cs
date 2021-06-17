@@ -1,4 +1,7 @@
+using blog.DAL;
 using System.Text;
+using blog.Controllers;
+using blog.DAL.Repository;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Builder;
@@ -7,9 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using blog.Controllers;
-using blog.DAL;
-using blog.DAL.Repository;
 
 namespace blog
 {
@@ -82,13 +82,10 @@ namespace blog
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
-            app.UseAuthentication();
-
-            app.UseAuthorization();
             app.UseCors("CorsPolicy");
-
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
