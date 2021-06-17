@@ -10,7 +10,7 @@ namespace blog.DAL
         public ApplicationDbContext CreateDbContext(string[] args)
         {
           var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-          var connectionString = @"Data Source=3.133.83.210,1433;Database=BlogAPI;User Id=hovhannes.sisoyan;Password=123456;Integrated Security=false;";
+          var connectionString = @"Data Source=18.116.203.141,1433;Database=BlogAPI;User Id=hovhannes.sisoyan;Password=123456;Integrated Security=false;";
           optionsBuilder.UseSqlServer(connectionString);
           return new ApplicationDbContext(optionsBuilder.Options);
         }
