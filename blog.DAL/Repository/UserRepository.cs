@@ -15,7 +15,15 @@ namespace blog.DAL
         }
         public User Create(User entity)
         {
-            _context.Users.Add(entity);
+            var response = _context.Users.Find(entity.UserId);
+            if (response == null)
+            {
+                _context.Users.Add(entity);
+            }
+            else
+            {
+                return null;
+            }
             _context.SaveChanges();
             return entity;
         }
@@ -26,9 +34,16 @@ namespace blog.DAL
 
         public User ReadById(int id)
         {
-            return _context.Users
+            PostRepository a = new PostRepository();
+            var user = _context.Users
                                .Where(user => user.UserId == id)
                                .SingleOrDefault();
+            for (int i = 0; i < user.Posts.Count; i++)
+            {
+                Post post = a.ReadById(user.Posts[i].PostId);
+                user.Posts.Add(post);
+            }
+            return user;
         }
         public User Update(User entity)
         {
@@ -61,6 +76,15 @@ namespace blog.DAL
                 _context.Users.Remove(trackedEntity);
             }
             _context.SaveChanges();
+        }
+        public User getUserByUsername(string username) {
+            return _context.Users.Where(user => user.Username == username).FirstOrDefault();
+        }
+        public User getUserByEmail(string email) {
+            return _context.Users.Where(user => user.Email == email).FirstOrDefault();
+        }
+        public User getUserById(int id) {
+            return _context.Users.Where(user => user.UserId == id).FirstOrDefault();
         }
         public void Dispose()
         {

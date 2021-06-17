@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
- 
- namespace blog.DAL
- {
+using Newtonsoft.Json;
+
+namespace blog.DAL
+{
       public class Post
-        {
+      {
             [Key]
             public int PostId { get; set; }
             public string Title { get; set; }
@@ -17,5 +18,6 @@ using System.ComponentModel.DataAnnotations.Schema;
             public int UserId { get; set; }
             public User User { get; set; }
             public List<Image> Image { get; set; }
-        }
- }
+            public List<Comment> Comments { get; set; }
+      }
+}

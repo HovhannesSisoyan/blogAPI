@@ -21,15 +21,27 @@ namespace blog.DAL
         }
         public IList<Post> ReadAll()
         {
-            return _context.Posts.ToList();
+            var response = _context.Posts.Include(post => post.User).ToList();
+            return response;
         }
 
         public Post ReadById(int id)
         {
-            return _context.Posts
-                               .Where(post => post.PostId == id)
-                               .SingleOrDefault();
+            var response = _context.Posts.Include(post => post.User)
+                .Where(post => post.PostId == id)
+                .SingleOrDefault();
+            return response;
         }
+
+        public IList<Post> ReadByTitle(string title)
+        {
+            var response = _context.Posts.Include(post => post.User)
+                .Where(post => post.Title.Contains(title))
+                .ToList();
+
+            return response;
+        }
+
         public Post Update(Post entity)
         {
             Post trackedEntity = _context.Posts.Find(entity.PostId);
