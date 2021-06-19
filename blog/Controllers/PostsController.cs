@@ -1,12 +1,7 @@
-﻿using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
+﻿using blog.DAL;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using blog.DAL;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Authorization;
 
 namespace blog.Controllers
 {
@@ -19,17 +14,19 @@ namespace blog.Controllers
         {
             this.repository = repository;
         }
-
-        [HttpGet]
+        [EnableCors("CorsPolicy")]
+        [HttpGet("/posts")]
         public IActionResult Get()
         {
             var response = repository.ReadAll();
             return Ok(response);
         }
 
-        [HttpGet("{id}")]
+        [EnableCors("CorsPolicy")]
+        [HttpGet("/posts/{id?}")]
         public IActionResult GetById(int id)
         {
+            System.Console.WriteLine(id);
             var response = repository.ReadById(id);
             if (response == null)
                 return NotFound();
@@ -37,21 +34,16 @@ namespace blog.Controllers
                 return Ok(response);
         }
 
-        [HttpGet("getbytitle")]
-        public IActionResult GetByTitle(string title)
+        [EnableCors("CorsPolicy")]
+        [HttpGet("/posts/search")]
+        public IActionResult GetByTitle([FromQuery] string key)
         {
-            var response = repository.ReadByTitle(title);
-            if (response.Count != 0)
-            {
-                return Ok(response);
-            }
-            else
-            {
-                return BadRequest();
-            }
+            var response = repository.ReadByTitle(key);
+            return Ok(response);
         }
-
-        [HttpPost]
+        [EnableCors("CorsPolicy")]
+        [HttpPost("/posts")]
+        [Authorize]
         public IActionResult Create(Post post)
         {
             UserRepository userRepo = new UserRepository();
